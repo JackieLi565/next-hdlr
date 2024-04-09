@@ -1,17 +1,16 @@
 {
-  "name": "frsh",
+  "name": "next-hdlr",
   "version": "0.0.0",
-  "description": "A lightweight session management store for Firebase Realtime DB.",
+  "description": "Next.js API route handler wrapper for simplifying HTTP request methods.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "keywords": [
-    "Firebase"
+    "Next.js"
   ],
   "author": "Jackie Li",
   "license": "MIT",
@@ -19,6 +18,7 @@
     "next": ">=9.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.12.6",
     "next": "^14.1.4",
     "typescript": "^5.4.4",
     "vitest": "^1.4.0"
