@@ -7,7 +7,9 @@
   "module": "./dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "test": "vitest"
   },
   "keywords": [
     "Next.js"
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^20.12.6",
     "next": "^14.1.4",
+    "rimraf": "^5.0.5",
     "typescript": "^5.4.4",
     "vitest": "^1.4.0"
   }
