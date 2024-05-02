@@ -1,6 +1,6 @@
 {
   "name": "next-hdlr",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Next.js API route handler wrapper for simplifying HTTP request methods.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
