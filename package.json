@@ -9,7 +9,10 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix",
+    "format": "npx prettier --write ."
   },
   "keywords": [
     "Next.js"
@@ -20,10 +23,15 @@
     "next": ">=9.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.1.1",
     "@types/node": "^20.12.6",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "next": "^14.1.4",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
     "typescript": "^5.4.4",
+    "typescript-eslint": "^7.8.0",
     "vitest": "^1.4.0"
   }
 }
