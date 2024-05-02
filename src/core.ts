@@ -1,78 +1,32 @@
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import {
-  Config,
-  RequestMethodMap,
-  RequestMethods,
-  ResponseStatus,
-} from "./types.js";
+import RouteHandler from "./handler.js";
+import { Config, ResponseStatus } from "./types.js";
+import { mergeConfigs } from "./utils.js";
 
-const defaultConfig: Config = {
-  messages: {
-    internalServerError: "Internal Server Error",
-    methodNotAllowed: "Method Not Allowed",
-  },
-};
+class Handler<S> {
+  private config: Config<S>;
 
-export class Handler {
-  private handlers: {
-    [method in RequestMethodMap]?: NextApiHandler;
-  } = {};
-
-  private config: Config;
-
-  public constructor(config: Config = defaultConfig) {
-    this.config = config;
-  }
-
-  get(fn: NextApiHandler): Handler {
-    this.handlers[RequestMethodMap.GET] = fn;
-    return this;
-  }
-
-  post(fn: NextApiHandler): Handler {
-    this.handlers[RequestMethodMap.POST] = fn;
-    return this;
-  }
-
-  put(fn: NextApiHandler): Handler {
-    this.handlers[RequestMethodMap.PUT] = fn;
-    return this;
-  }
-
-  patch(fn: NextApiHandler): Handler {
-    this.handlers[RequestMethodMap.PATCH] = fn;
-    return this;
-  }
-
-  delete(fn: NextApiHandler): Handler {
-    this.handlers[RequestMethodMap.DELETE] = fn;
-    return this;
-  }
-
-  build(): NextApiHandler {
-    const methods = Object.keys(this.handlers);
-    const handlers = this.handlers;
-    const config = this.config;
-
-    return async function (req: NextApiRequest, res: NextApiResponse) {
-      const method = req.method as RequestMethods;
-
-      const handler = handlers[method];
-
-      if (handler) {
-        try {
-          await handler(req, res);
-        } catch (e: any) {
-          res
-            .status(ResponseStatus.InternalServerError)
-            .send(config.messages.internalServerError);
-        }
-      } else {
-        res.setHeader("Allow", methods);
+  constructor(config?: Partial<Config<S>>) {
+    const defaultConfig: Config<S> = {
+      methodNotAllowedFn: async (_, res) => {
+        res.status(ResponseStatus.MethodNotAllowed).send("Method not allowed");
+      },
+      unAuthorizedFn: async (_, res) => {
+        res.status(ResponseStatus.Unauthorized).send("Unauthorized");
+      },
+      internalServerErrorFn: async (_, res) => {
         res
-          .status(ResponseStatus.MethodNotAllowed)
-          .send(config.messages.methodNotAllowed);
-      }
+          .status(ResponseStatus.InternalServerError)
+          .send("Internal server error");
+      },
     };
+
+    this.config = mergeConfigs<Config<S>>(defaultConfig, config);
+  }
+
+  public create(overrideConfig?: Partial<Config<S>>): RouteHandler<S> {
+    const finalConfig = mergeConfigs<Config<S>>(this.config, overrideConfig);
+    return new RouteHandler<S>(finalConfig);
   }
 }
+
+export default Handler;

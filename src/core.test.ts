@@ -1,39 +1,24 @@
-import { describe, it, expect, vi } from "vitest";
-import { Handler } from "./core";
-
-const mockGetHandler = vi.fn();
-const mockPostHandler = vi.fn();
-const mockPutHandler = vi.fn();
-const mockPatchHandler = vi.fn();
-const mockDeleteHandler = vi.fn();
+import { describe, it, expect } from "vitest";
+import Handler from "./core";
 
 describe("Handler", () => {
-  it.each([
-    ["GET", mockGetHandler],
-    ["POST", mockPostHandler],
-    ["PUT", mockPutHandler],
-    ["PATCH", mockPatchHandler],
-    ["DELETE", mockDeleteHandler],
-  ])(
-    "should call the correct handler for %s method",
-    async (method, handler) => {
-      const req = { method } as any;
-      const res = {
-        setHeader: vi.fn(),
-        status: vi.fn().mockReturnValue({ send: vi.fn() }),
-      } as any;
+  it("should return a new instance on each create call", () => {
+    const handler = new Handler();
+    const routeHandler1 = handler.create();
+    const routeHandler2 = handler.create();
 
-      const apiHandler = new Handler()
-        .get(mockGetHandler)
-        .post(mockPostHandler)
-        .put(mockPutHandler)
-        .patch(mockPatchHandler)
-        .delete(mockDeleteHandler)
-        .build();
+    expect(routeHandler1).not.toBe(routeHandler2);
+  });
 
-      await apiHandler(req, res);
+  it("should return a new instance on each create call with different configurations", () => {
+    const handler = new Handler();
+    const routeHandler1 = handler.create({
+      methodNotAllowedFn: async (_, res) => res.send("Custom not allowed"),
+    });
+    const routeHandler2 = handler.create({
+      unAuthorizedFn: async (_, res) => res.send("Custom unauthorized"),
+    });
 
-      expect(handler).toHaveBeenCalled();
-    }
-  );
+    expect(routeHandler1).not.toBe(routeHandler2);
+  });
 });

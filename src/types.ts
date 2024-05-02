@@ -1,4 +1,6 @@
-export enum RequestMethodMap {
+import { NextApiRequest, NextApiResponse } from "next";
+
+export enum RequestMethod {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
@@ -10,7 +12,6 @@ export enum RequestMethodMap {
   TRACE = "TRACE",
 }
 
-// TODO: add missing response methods (if any)
 export enum ResponseStatus {
   OK = 200,
   Created = 201,
@@ -29,11 +30,34 @@ export enum ResponseStatus {
   GatewayTimeout = 504,
 }
 
-export interface Config {
-  messages: {
-    internalServerError: string;
-    methodNotAllowed: string;
-  };
+export type NextApiSessionHandler<S> = (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  session?: S
+) => Promise<unknown>;
+
+export type Method = keyof typeof RequestMethod;
+
+export interface Config<S> {
+  authFn?: AuthHandler<S>;
+  authRoutes?: RequestMethod[];
+  methodNotAllowedFn: PromiseNextApiHandler;
+  unAuthorizedFn: PromiseNextApiHandler;
+  internalServerErrorFn: ServerErrorHandler;
 }
 
-export type RequestMethods = keyof typeof RequestMethodMap;
+export type PromiseNextApiHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<unknown>;
+
+export type AuthHandler<S> = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<{ authorized: true; data: S } | { authorized: false }>;
+
+export type ServerErrorHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  error: any
+) => Promise<void>;
