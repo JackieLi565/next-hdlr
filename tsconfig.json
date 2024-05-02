@@ -7,7 +7,7 @@
     "declaration": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
-    "outDir": "./dist",
+    "outDir": "lib",
     "sourceMap": true,
     "lib": ["ES2022"]
   },
