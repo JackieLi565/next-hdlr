@@ -1,5 +1,10 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { NextApiSessionHandler, Config, RequestMethod } from "./types.js";
+import type { Config, NextApiSessionHandler } from "./types.js";
+import {
+  InternalConfig,
+  RequestMethod,
+  ResponseStatus,
+} from "./internal/types.js";
 
 class RouteHandler<S> {
   private handlers: {
@@ -9,6 +14,19 @@ class RouteHandler<S> {
   private config: Config<S>;
 
   public constructor(config: Config<S>) {
+    const defaultConfig: Config<S> = {
+      methodFn: async (_, res) => {
+        res.status(ResponseStatus.MethodNotAllowed).send("Method not allowed");
+      },
+      unAuthFn: async (_, res) => {
+        res.status(ResponseStatus.Unauthorized).send("Unauthorized");
+      },
+      errorFn: async (_, res) => {
+        res
+          .status(ResponseStatus.InternalServerError)
+          .send("Internal server error");
+      },
+    };
     this.config = config;
   }
 
@@ -44,23 +62,24 @@ class RouteHandler<S> {
 
       if (!handler) {
         res.setHeader("Allow", methods);
-        await config.methodNotAllowedFn(req, res);
+        await config.methodFn(req, res);
         return;
       }
 
       try {
+        // PROBLEM: should i pass in the next function?
         if (config.authFn && config.authRoutes?.includes(method)) {
           const authResponse = await config.authFn(req, res);
           if (authResponse.authorized) {
             await handler(req, res, authResponse.data);
           } else {
-            await config.unAuthorizedFn(req, res);
+            await config.unAuthFn(req, res);
           }
         } else {
           await handler(req, res);
         }
       } catch (err: any) {
-        await config.internalServerErrorFn(req, res, err);
+        await config.errorFn(req, res, err);
       }
     };
   }
@@ -72,6 +91,7 @@ class RouteHandler<S> {
     if (this.handlers[method]) {
       throw new Error(`Handler for ${method} already set`);
     }
+
     this.handlers[method] = fn;
     return this;
   }
