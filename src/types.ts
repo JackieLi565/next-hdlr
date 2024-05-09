@@ -1,26 +1,25 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { InternalConfig, RequestMethod } from "./internal/types.js";
+import { DefaultConfig } from "./internal/types.js";
 
-export type Config<S> = Partial<InternalConfig<S>>;
+export interface Config<S = {}> extends Partial<DefaultConfig> {
+  sessionFn?: NextApiSessionHandler<S>;
+}
+
+type ApiResponseHandler = Promise<unknown> | unknown;
 
 export type NextApiSessionHandler<S> = (
   req: NextApiRequest,
+  res: NextApiResponse
+) => S | undefined;
+
+export type NextApiHandlerWithSession<S> = (
+  req: NextApiRequest,
   res: NextApiResponse,
   session?: S
-) => Promise<unknown>;
+) => ApiResponseHandler;
 
-export type PromiseNextApiHandler = (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => Promise<unknown>;
-
-export type AuthHandler<S> = (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => Promise<{ authorized: true; data: S } | { authorized: false }>;
-
-export type ServerErrorHandler = (
+export type NextApiHandlerWithError = (
   req: NextApiRequest,
   res: NextApiResponse,
   error: any
-) => Promise<void>;
+) => ApiResponseHandler;

@@ -1,8 +1,5 @@
-import {
-  AuthHandler,
-  PromiseNextApiHandler,
-  ServerErrorHandler,
-} from "../types.js";
+import { NextApiHandler } from "next";
+import { NextApiHandlerWithError } from "../types.js";
 
 export enum RequestMethod {
   GET = "GET",
@@ -21,9 +18,7 @@ export enum ResponseStatus {
 
 export type Method = keyof typeof RequestMethod;
 
-export interface InternalConfig<S = {}> {
-  sessionFn?: AuthHandler<S>;
-  methodFn: PromiseNextApiHandler;
-  unAuthFn: PromiseNextApiHandler;
-  errorFn: ServerErrorHandler;
+export interface DefaultConfig {
+  methodFn: NextApiHandler;
+  errorFn: NextApiHandlerWithError;
 }

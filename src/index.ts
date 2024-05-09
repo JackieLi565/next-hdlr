@@ -1,2 +1,3 @@
-export * from "./core.js";
+export * from "./defaultHandler.js";
 export * from "./types.js";
+export * from "./routeHandler.js";
