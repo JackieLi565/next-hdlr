@@ -14,7 +14,7 @@ class RouteHandler<S> {
 
   private config: Config<S>;
 
-  public constructor(config: Config<S>) {
+  public constructor(config?: Config<S>) {
     const defaultConfig: DefaultConfig = {
       methodFn: async (_, res) => {
         res.status(ResponseStatus.MethodNotAllowed).send("Method not allowed");
