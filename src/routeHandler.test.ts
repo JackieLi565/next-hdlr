@@ -2,8 +2,16 @@ import { describe, expect, it, vi } from "vitest";
 import RouteHandler from "./routeHandler";
 import { mockReq, mockRes } from "./mocks";
 import { RequestMethod, ResponseStatus } from "./internal/types";
+import { Config } from "./types";
+import DefaultHandler from "./defaultHandler";
 
 describe("RouteHandler", () => {
+  it("should throw if the same method handler is called twice", async () => {
+    const handler = new RouteHandler().get(vi.fn());
+
+    expect(() => handler.get(vi.fn())).toThrow(/already set/);
+  });
+
   describe("Request Method Handlers", () => {
     const methods = {
       [RequestMethod.GET]: "get",
@@ -198,9 +206,58 @@ describe("RouteHandler", () => {
     });
   });
 
-  it("should throw if the same method handler is called twice", async () => {
-    const handler = new RouteHandler().get(vi.fn());
+  describe("Override Default Config", () => {
+    const defaultConfig: Config = {
+      sessionFn: vi.fn(),
+      errorFn: vi.fn(),
+      methodFn: vi.fn(),
+    };
 
-    expect(() => handler.get(vi.fn())).toThrow(/already set/);
+    const overrideConfig: Config = {
+      sessionFn: vi.fn(),
+      errorFn: vi.fn(),
+      methodFn: vi.fn(),
+    };
+
+    const defaultHandler = new DefaultHandler(defaultConfig);
+
+    it("should execute override 'sessionFn'", async () => {
+      const req = mockReq(RequestMethod.GET),
+        res = mockRes();
+
+      const handler = defaultHandler.create(overrideConfig);
+      await handler.get(vi.fn()).build()(req, res);
+
+      expect(overrideConfig.sessionFn).toBeCalled();
+      expect(defaultConfig.sessionFn).not.toBeCalled();
+    });
+
+    it("should execute override 'errorFn'", async () => {
+      const req = mockReq(RequestMethod.GET),
+        res = mockRes();
+
+      const handler = defaultHandler.create(overrideConfig);
+      await handler
+        .get(
+          vi.fn(() => {
+            throw new Error("Something went wrong");
+          })
+        )
+        .build()(req, res);
+
+      expect(overrideConfig.errorFn).toBeCalled();
+      expect(defaultConfig.errorFn).not.toBeCalled();
+    });
+
+    it("should execute override 'methodFn'", async () => {
+      const req = mockReq(RequestMethod.POST),
+        res = mockRes();
+
+      const handler = defaultHandler.create(overrideConfig);
+      await handler.get(vi.fn()).build()(req, res);
+
+      expect(overrideConfig.methodFn).toBeCalled();
+      expect(defaultConfig.methodFn).not.toBeCalled();
+    });
   });
 });
