@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import DefaultHandler from "./defaultHandler";
+import { DefaultHandler } from "./defaultHandler";
 import { mockReq, mockRes } from "./mocks";
 import { Config } from "./types";
 import { RequestMethod } from "./internal/types";

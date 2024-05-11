@@ -10,7 +10,7 @@ type ApiResponseHandler = Promise<unknown> | unknown;
 export type NextApiSessionHandler<S> = (
   req: NextApiRequest,
   res: NextApiResponse
-) => S | undefined;
+) => S | void;
 
 export type NextApiHandlerWithSession<S> = (
   req: NextApiRequest,

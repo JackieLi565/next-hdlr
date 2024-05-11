@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import RouteHandler from "./routeHandler";
+import { RouteHandler } from "./routeHandler";
 import { mockReq, mockRes } from "./mocks";
 import { RequestMethod, ResponseStatus } from "./internal/types";
 import { Config } from "./types";
-import DefaultHandler from "./defaultHandler";
+import { DefaultHandler } from "./defaultHandler";
 
 describe("RouteHandler", () => {
   it("should throw if the same method handler is called twice", async () => {

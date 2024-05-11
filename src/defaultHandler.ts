@@ -1,8 +1,8 @@
-import RouteHandler from "./routeHandler.js";
+import { RouteHandler } from "./routeHandler.js";
 import type { Config } from "./types.js";
 import { mergeConfigs } from "./utils.js";
 
-class DefaultHandler<S> {
+export class DefaultHandler<S> {
   private config: Config<S>;
 
   constructor(config: Config<S> = {}) {
@@ -14,5 +14,3 @@ class DefaultHandler<S> {
     return new RouteHandler<S>(config);
   }
 }
-
-export default DefaultHandler;

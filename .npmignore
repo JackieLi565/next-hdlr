@@ -2,3 +2,4 @@
 eslint.config.js
 src/
 tsconfig.json
+example/

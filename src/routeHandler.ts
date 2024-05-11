@@ -7,7 +7,7 @@ import {
 } from "./internal/types.js";
 import { mergeConfigs } from "./utils.js";
 
-class RouteHandler<S> {
+export class RouteHandler<S> {
   private handlers: {
     [method in RequestMethod]?: NextApiHandlerWithSession<S>;
   } = {};
@@ -74,7 +74,7 @@ class RouteHandler<S> {
         const authResponse = await config.sessionFn(req, res);
         if (res.writableEnded) return;
 
-        await handler(req, res, authResponse);
+        await handler(req, res, authResponse!);
       } catch (err: any) {
         await config.errorFn!(req, res, err);
       }
@@ -93,5 +93,3 @@ class RouteHandler<S> {
     return this;
   }
 }
-
-export default RouteHandler;
