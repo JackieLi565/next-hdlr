@@ -12,5 +12,5 @@
     "lib": ["ES2022"]
   },
   "include": ["src"],
-  "exclude": ["node_modules/", "**/*.test.ts", "mocks.ts"]
+  "exclude": ["node_modules/", "**/*.test.ts", "src/mocks.ts"]
 }
