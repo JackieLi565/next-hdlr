@@ -12,7 +12,7 @@ export type NextApiSessionHandler<S> = (
   res: NextApiResponse
 ) => S | void;
 
-export type NextApiHandlerWithSession<S> = (
+export type NextApiHandlerWithSession<S = any> = (
   req: NextApiRequest,
   res: NextApiResponse,
   session?: S
