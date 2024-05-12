@@ -51,6 +51,8 @@ If so, Next-Hdlr Is the perfect utility for you, as you can take all that boiler
 ```js
 const handler = new RouteHandler();
 
+// Handlers ...
+
 handler.get((req, res) => GET(req, res));
 
 handler.post((req, res) => POST(req, res));
