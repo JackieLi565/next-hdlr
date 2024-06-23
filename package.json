@@ -1,6 +1,6 @@
 {
   "name": "next-hdlr",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "Next.js API route handler wrapper for simplifying HTTP request methods.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -12,7 +12,7 @@
     "test": "vitest",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "format": "npx prettier --write ."
+    "deploy": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",

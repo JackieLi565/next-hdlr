@@ -1,25 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { DefaultConfig } from "./internal/types.js";
 
-export interface Config<S = {}> extends Partial<DefaultConfig> {
-  sessionFn?: NextApiSessionHandler<S>;
+export interface NextApiJSONRequest<P = Record<string, unknown>>
+  extends NextApiRequest {
+  body: P;
 }
 
-type ApiResponseHandler = Promise<unknown> | unknown;
+export type NextApiMutationHandler<Req = any, Res = any> = (
+  req: NextApiJSONRequest<Req>,
+  res: NextApiResponse<Res>
+) => Promise<unknown> | unknown;
 
-export type NextApiSessionHandler<S> = (
+export type NextApiQueryHandler<Res = any> = (
   req: NextApiRequest,
-  res: NextApiResponse
-) => S | void;
-
-export type NextApiHandlerWithSession<S = any> = (
-  req: NextApiRequest,
-  res: NextApiResponse,
-  session?: S
-) => ApiResponseHandler;
-
-export type NextApiHandlerWithError = (
-  req: NextApiRequest,
-  res: NextApiResponse,
-  error: any
-) => ApiResponseHandler;
+  res: NextApiResponse<Res>
+) => Promise<unknown> | unknown;

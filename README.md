@@ -51,17 +51,16 @@ If so, Next-Hdlr Is the perfect utility for you, as you can take all that boiler
 ```js
 const handler = new RouteHandler();
 
-// Handlers ...
+// method handlers ...
+handler.GET((req, res) => {});
 
-handler.get((req, res) => GET(req, res));
+handler.POST((req, res) => {});
 
-handler.post((req, res) => POST(req, res));
+handler.PATCH((req, res) => {});
 
-handler.patch((req, res) => PATCH(req, res));
+handler.PUT((req, res) => {});
 
-handler.put((req, res) => PUT(req, res));
-
-handler.delete((req, res) => DELETE(req, res));
+handler.DELETE((req, res) => {});
 
 export default handler.build();
 ```
@@ -87,16 +86,16 @@ You can configure individual routes using the RouteHandler class. This class all
 Here’s how you set up a simple API handler within the `/pages/api` directory:
 
 ```js
-import { RouteHandler } from "next-hdlr";
+import { Handler } from "next-hdlr";
 
 const handler = new RouteHandler();
 
 // Define endpoints
-handler.get((req, res) => {
+handler.GET((req, res) => {
   res.status(200).json({ message: "GET request success" });
 });
 
-handler.post((req, res) => {
+handler.POST((req, res) => {
   res.status(201).json({ message: "POST request success" });
 });
 ```
@@ -109,115 +108,27 @@ After defining all the routes, use the `build()` method to create your route han
 export default handler.build();
 ```
 
-### Configuration Options
+### TypeScript
 
-`RouteHandler` accepts a configuration object with optional settings:
-
-- `methodFn`: Function to handle unsupported methods.
-- `errorFn`: Function to handle errors during the execution of your route logic.
-- `sessionFn`: Optional function to handle session validation or creation.
-
-Passing in a custom function will override the default `errorFn` and `methodFn`.
-
-### Global Configuration
-
-If you only need to define your configuration once you can export a `DefaultHandler` to create `RouteHandler`'s that inherent your default configuration.
-
-```js
-import { DefaultHandler } from "next-hdlr";
-
-const config = {
-  // Global configuration
-};
-
-export default new DefaultHandler(config);
-```
-
-You can then create `RouteHandler`'s by using the `create` method
-
-```js
-import DefaultHandler from "my/defaultHandler/path";
-
-const handler = DefaultHandler.create();
-
-handler.get((req, res) => {
-  res.status(200).json({ message: "GET request success" });
-});
-
-export default handler.build();
-```
-
-### Middleware (Handling Sessions)
-
-If your project requires any form of authorization or you simply want to run some logic before your method handler fires off - You can integrate session handling directly into your route configuration:
-
-```js
-const handler = new RouteHandler({
-  sessionFn: async (req, res) => {
-    // Session logic here
-    const isAuthorized = true;
-
-    if (isAuthorized) {
-      res.status(401).send("Unauthorized");
-      return;
-    }
-    return { user: "username" };
-  },
-});
-
-handler.get(async (req, res, session) => {
-  /**
-   * session parameter receives the object:
-   * { user: "username" }
-   **/
-  res.status(200).json({ message: `Welcome ${session.user}` });
-});
-
-export default handler.build();
-```
-
-For TypeScript users `RouteHandler` accepts a generic for the `sessionFn` response.
+To leverage intellisense and improve the DX, pass your expected type to the method handler. This way, you can take full advantage of TypeScript's powerful type inference.
 
 ```ts
-interface Session {
-  user: string;
+interface POSTRequestPayload {
+  data: string;
 }
 
-new RouteHandler<Session>({
-  sessionFn: async (req, res) => {
-    // Session logic here
-    return { user: "username" };
-  },
+interface POSTResponsePayload {
+  message: string;
+}
+
+handler.POST<POSTPayload, POSTResponsePayload>((req, res) => {
+  console.log(req.body.data);
+
+  res.status(200).json({ message: "`data` is defined!" });
 });
 ```
 
-### Error Handling
-
-You can define a custom error function to manage unexpected errors across your API:
-
-```js
-new RouteHandler({
-  errorFn: (req, res, err) => {
-    console.error("Error:", err);
-    res.status(500).send("Internal Server Error");
-  },
-});
-```
-
-The `err` parameter receives the error thrown by one of the method handlers if it were to occur.
-
-### Invalid Method Handling
-
-If you would like to log or handle invalid methods requests on your own you can do so by providing a custom method handler:
-
-```js
-new RouteHandler({
-  methodFn: (req, res) => {
-    console.log("invalid method");
-    res.status(405).send("Method not Allowed");
-  },
-});
-```
+Please note that methods `GET` and `DELETE` only take a response generics while methods `POST`, `PATCH`, and `PUT` have both request and response payload generics. See [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231).
 
 ## Issues
 
