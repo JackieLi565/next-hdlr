@@ -47,16 +47,22 @@ export class Handler {
 
       if (!handler) {
         res.setHeader("Allow", methods);
-        return res.status(ResponseStatus.MethodNotAllowed);
+        res.status(ResponseStatus.MethodNotAllowed).json({
+          error: "method not allowed",
+          message: `The request method ${method} is not supported for this resource.`,
+        });
+        return;
       }
 
       try {
         await handler(req, res);
       } catch (err: any) {
-        console.log(err);
-        return res
-          .status(ResponseStatus.InternalServerError)
-          .send(`${err.name}: ${err.message}`);
+        res.status(ResponseStatus.InternalServerError).json({
+          error: "internal server error",
+          message: err.message,
+        });
+
+        return;
       }
     };
   }
